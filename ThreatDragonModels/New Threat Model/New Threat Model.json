@@ -1,28 +1,95 @@
 {
-  "version": "2.6.2",
-  "release_version": "",
-  "released_at": "",
-  "summary": {
-    "title": "New Threat Model",
-    "owner": "",
-    "description": "",
-    "id": 0
-  },
-  "detail": {
-    "contributors": [],
-    "diagrams": [
+  "goal": {
+    "id": "goal",
+    "label": "Steal customer payment data from Helix Pay",
+    "gate": "OR",
+    "children": [
       {
-        "id": 2,
-        "title": "New STRIDE diagram",
-        "diagramType": "STRIDE",
-        "placeholder": "New STRIDE diagram description",
-        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
-        "version": "2.6.2",
-        "cells": []
+        "id": "db_access",
+        "label": "DB access",
+        "gate": "OR",
+        "children": [
+          {
+            "id": "admin_compromised",
+            "label": "Admin accounts compromised",
+            "gate": "AND",
+            "children": [
+              {
+                "id": "weak_mfa",
+                "label": "Weak MFA implementation",
+                "gate": "OR",
+                "children": [
+                  { "id": "phishing_1", "label": "Phishing", "uncertain": true }
+                ]
+              },
+              { "id": "admin_16", "label": "16 admin accounts" }
+            ]
+          },
+          {
+            "id": "priv_esc",
+            "label": "Privilege escalation",
+            "gate": "OR",
+            "children": [
+              {
+                "id": "jenkins",
+                "label": "Jenkins server",
+                "gate": "OR",
+                "children": [
+                  { "id": "phishing_2", "label": "Phishing" }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "payment_server",
+            "label": "Payment server",
+            "gate": "OR",
+            "children": [
+              { "id": "log4j", "label": "Log4j" }
+            ]
+          },
+          {
+            "id": "lateral_movement",
+            "label": "Lateral movement",
+            "gate": "OR",
+            "children": [
+              {
+                "id": "ms_services",
+                "label": "MS services",
+                "gate": "OR",
+                "children": [
+                  { "id": "mitm", "label": "MITM" }
+                ]
+              },
+              { "id": "staging_api_exposed", "label": "Staging/API server exposed", "uncertain": true }
+            ]
+          },
+          {
+            "id": "aws_exposed",
+            "label": "AWS cloud publicly exposed",
+            "gate": "OR",
+            "children": [
+              { "id": "security_misconfig", "label": "Security misconfig" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "app",
+        "label": "App",
+        "gate": "OR",
+        "children": [
+          { "id": "phishing_customer", "label": "Phishing customer" },
+          { "id": "api_gateway", "label": "API Gateway" }
+        ]
+      },
+      { "ref": "payment_server" },
+      {
+        "id": "xss_branch",
+        "label": "XSS (barrato) / evidence / Howl?",
+        "uncertain": true,
+        "note": "Ramo a sinistra con freccia lunga verso il goal, non leggibile con certezza"
       }
-    ],
-    "diagramTop": 3,
-    "reviewer": "",
-    "threatTop": 0
+    ]
   }
 }
